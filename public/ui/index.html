@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<title>IBM Watson Translation</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.5/angular.min.js"></script>
+	</head>
+<body>
+	<div class="container" ng-app="" ng-controller="customersController">
+		<div class="main">
+		<h1>IBM Watson Translation</h1>
+		<form novalidate>
+			<select class="select" ng-init="SelectedItemOnChange()" ng-change="SelectedItemOnChange()" ng-model="selectedItem" ng-options="item.text for item in items">
+				<option value="{{item.value}}">{{item.text}}</option>
+			</select><br>
+			<textarea rows="4" cols="50" class="textarea" type="text" ng-model="query"></textarea>
+			<button class="submit" ng-click="submit()">Translate</button><br>
+		</form>
+		<br>
+		<p>
+			<span class="customFont">You:</span> {{ query }} <br>
+		<p>
+			<span class="customFont">Watson:</span> {{ message }} <br>
+		<p>
+			<span class="customFont">Sentiment:</span> {{ sentiment }}<br><br><br>
+		<p>
+			<img ng-if="sentiment>0" src="img/good.png" /><img ng-if="sentiment<0"
+				src="img/bad.png" /><img ng-if="sentiment==0" src="img/neutral.png"/>
+			</div>
+	</div>
+
+	<script>
+		function customersController($scope, $http) {
+			$scope.submit = function() {
+				$http.get(encodeURI("../olli?message=" + $scope.query + "&lang=" + $scope.selectedItem.value))
+						.success(function(response, data, status) {
+							$scope.message = response.split(";")[0];
+							$scope.sentiment = response.split(";")[1];
+						}).error(
+								function(response, data, status) {
+									alert("error" + response + ":" + data + ":"
+											+ status);
+								});
+
+			};
+			$scope.items = [{value: 'mt-enus-ptbr', text: 'English To Portuguese'}, {value: 'mt-ptbr-enus', text: 'Portuguese To English'}, {value: 'mt-enus-eses', text: 'English To Spanish'}, {value: 'mt-eses-enus', text: 'Spanish To English'}, {value: 'mt-frfr-enus', text: 'French To English'}, {value: 'mt-enus-frfr', text: 'English To French'}, {value: 'mt-arar-enus', text: 'Arabic To English'}];
+			$scope.selectedItem = $scope.items[0];
+			$scope.SelectedItemOnChange = function() {
+				document.title = "IBM Watson Translation - " + $scope.selectedItem.text;
+			}
+		}
+			
+	</script>
+</body>
+</html>
